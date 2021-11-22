@@ -1,4 +1,4 @@
-from logging import getLogger, DEBUG, Formatter, StreamHandler
+from logging import getLogger, DEBUG, Formatter, StreamHandler, FileHandler
 
 
 def setup_logger():
@@ -14,7 +14,10 @@ def setup_logger():
 
     console_handler = StreamHandler()
     console_handler.setFormatter(formatter)
-
     _logger.addHandler(console_handler)
+
+    file_handler = FileHandler('simulation.log')
+    file_handler.setFormatter(formatter)
+    _logger.addHandler(file_handler)
 
     return _logger
