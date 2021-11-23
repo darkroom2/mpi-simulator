@@ -6,19 +6,19 @@ required that the probability of loss does not exceed a given value._
 
 ## Solution
 
-The proposed solution involves a simulator that generates with exponential
-distribution the incoming packets to a system with N devices handling them.
-After the simulation, the maximum traffic to the server is counted and
-presented.
+A naive method of checking Erlang's formula for a given number of serving
+devices and a given packet blocking probability involves calculating the maximum
+traffic offered to the server (using a formula and a numerical method) and
+running a simulation in which the previously calculated traffic is a parameter
+and checking whether the simulation-calculated probability is close to the given
+one.
 
-The simulator allows modifying the simulation parameters from the configuration
-file.
+The simulator allows modifying the simulation parameters in
+the [config/config.json](config/config.json) file.
 
-## Analysis
+## TODO
 
-DONE: Working Erlang B simulator.
-
-TODO: Make Inverse Erlang B simulator.
+* Making simulation independent of formula-calculated max traffic value.
 
 ---
 
@@ -55,17 +55,18 @@ pip3 install numpy
 
 ### Usage
 
-First, change the parameters in the [config.json](config/config.json)
-file.
+First, change the parameters in its configuration file.
 
 You can also create your own json file with all needed parameters, for example:
 
 ```json
 {
-  "lambda": 8,
-  "mi": 8,
-  "servers": 10,
-  "simulation_time": 10
+  "lambda": 1,
+  "servers": 5,
+  "simulation_time": 5,
+  "blocking_probability": 0.2,
+  "seed": 123,
+  "show_plots": true
 }
 ```
 

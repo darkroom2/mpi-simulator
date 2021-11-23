@@ -1,7 +1,8 @@
 {
-  "lambda": 4,
-  "mi": 1,
+  "lambda": 1,
   "servers": 5,
   "simulation_time": 5,
-  "blocking_probability": 0.2
+  "blocking_probability": 0.2,
+  "seed": 123,
+  "show_plots": true
 }
