@@ -7,8 +7,6 @@ from numpy.random import default_rng
 
 class Simulator:
     def __init__(self, lam, mi, servers: int, max_time: float):
-        self.lam = lam  # Lambda
-        self.mi = mi  # Mi
         self.servers = servers  # Number of servers
         self.max_time = max_time  # Simulation time
         self.busy = 0  # Busy servers counter

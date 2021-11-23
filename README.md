@@ -16,7 +16,9 @@ file.
 
 ## Analysis
 
-DONE: Working Erlang B simulator.
+Finding the maximum traffic offered to the server is done by starting with rho=0
+and incrementing it in 0.001 increments until the Erlang function reaches the
+desired value.
 
 TODO: Make Inverse Erlang B simulator.
 
