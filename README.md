@@ -13,8 +13,8 @@ running a simulation in which the previously calculated traffic is a parameter
 and checking whether the simulation-calculated probability is close to the given
 one.
 
-The simulator allows modifying the simulation parameters in
-the [config/config.json](config/config.json) file.
+The simulator allows modifying the simulation parameters in its configuration
+file.
 
 ## TODO
 
@@ -27,6 +27,7 @@ the [config/config.json](config/config.json) file.
 `python >= 3.6`
 `pip`
 `numpy`
+`matplotlib`
 
 ## Setup
 
@@ -43,19 +44,20 @@ sudo apt install python3 python3-pip
 
 https://www.python.org/downloads/
 
-This will install Python as well as `pip`
+This will install Python as well as `pip`.
 
 ### Install Python requirements
 
 ```commandline
-pip3 install numpy
+pip3 install -r requirements.txt
 ```
 
 ---
 
 ### Usage
 
-First, change the parameters in its configuration file.
+First, change the parameters in the [config/config.json](config/config.json)
+file.
 
 You can also create your own json file with all needed parameters, for example:
 
