@@ -7,7 +7,8 @@ setup(
     author='darkroom2',
     author_email='rkomorowski97@gmail.com',
     install_requires=[
-        'numpy'
+        'numpy',
+        'matplotlib'
     ],
     packages=['simulator']
 )

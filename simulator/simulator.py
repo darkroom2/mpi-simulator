@@ -6,7 +6,7 @@ from numpy.random import default_rng
 
 
 class Simulator:
-    def __init__(self, lam, mi, servers: int, max_time: float):
+    def __init__(self, lam, mi, servers: int, max_time: float, seed: int):
         self.lam = lam  # Lambda
         self.mi = mi  # Mi
         self.servers = servers  # Number of servers
@@ -17,7 +17,8 @@ class Simulator:
         self.blocked = 0  # Rejected packet counter
         self.served = 0  # Served packet counter
         self.event_list: List[Tuple] = []  # Event list
-        self.rng = default_rng()  # Random number generator
+        self.rng = default_rng(seed)  # Random number generator
+        self.blocking_probability = 0
 
     def end(self):
         """End simulation condition."""
@@ -61,13 +62,13 @@ class Simulator:
                 self.served += 1
                 self.busy -= 1
 
-        info('Simulation ended')
+        self.blocking_probability = self.blocked / self.arrivals
 
         info(f'Results: '
              f'arrivals = {self.arrivals}, '
              f'served = {self.served}, '
              f'blocked = {self.blocked}, '
-             f'P_block = {self.blocked / self.arrivals}')
+             f'P_block = {self.blocking_probability}')
 
     def pop_list(self):
         """Returns next to come event."""
@@ -96,3 +97,6 @@ class Simulator:
         events with number of servers. """
 
         return self.busy == self.servers
+
+    def get_result(self):
+        return self.blocking_probability
