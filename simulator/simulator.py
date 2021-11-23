@@ -1,4 +1,4 @@
-from logging import info
+from logging import info, debug
 from time import time
 from typing import List, Tuple
 
@@ -15,7 +15,7 @@ class Simulator:
         self.start_time = 0  # Simulation start time
         self.arrivals = 0  # Incoming packet counter
         self.blocked = 0  # Rejected packet counter
-        self.served = 0  # Handled packet counter
+        self.served = 0  # Served packet counter
         self.event_list: List[Tuple] = []  # Event list
         self.rng = default_rng()  # Random number generator
 
@@ -34,36 +34,40 @@ class Simulator:
         ev = ('arrival', self.start_time)
         self.event_list.append(ev)
         self.arrivals += 1
-        info(f'Adding to event list {ev}')
+        debug(f'Adding to event list {ev}')
 
         while not self.end():
             # Take event from list
             ev = self.pop_list()
             ev_type, ev_time = ev
-            info(f'New event appeared {ev}')
+            debug(f'New event appeared {ev}')
 
             if ev_type == 'arrival':
                 if not self.servers_busy():
-                    new_ev2 = (f'end_of_service_{self.busy + 1}', ev_time + self.serve_time())
-                    self.event_list.append(new_ev2)
-                    info(f'Adding to event list {new_ev2}')
+                    eos_ev = (f'end_of_service_{self.busy + 1}',
+                              ev_time + self.serve_time())
+                    self.event_list.append(eos_ev)
                     self.busy += 1
+                    debug(f'Adding to event list {eos_ev}')
                 else:
                     self.blocked += 1
+
+                new_ev = ('arrival', ev_time + self.arrival_time())
+                self.event_list.append(new_ev)
+                self.arrivals += 1
+                debug(f'Adding to event list {new_ev}')
 
             elif 'end_of_service' in ev_type:
                 self.served += 1
                 self.busy -= 1
 
-            new_ev = ('arrival', ev_time + self.arrival_time())
-            self.event_list.append(new_ev)
-            self.arrivals += 1
-            info(f'Adding to event list {new_ev}')
-            info(f'arv={self.arrivals}, '
-                 f'bsy={self.busy}, '
-                 f'srvd={self.served}, '
-                 f'blck={self.blocked}, '
-                 f'P_block={self.blocked / self.arrivals}')
+        info('Simulation ended')
+
+        info(f'Results: '
+             f'arrivals = {self.arrivals}, '
+             f'served = {self.served}, '
+             f'blocked = {self.blocked}, '
+             f'P_block = {self.blocked / self.arrivals}')
 
     def pop_list(self):
         """Returns next to come event."""
@@ -88,6 +92,7 @@ class Simulator:
         return self.rng.exponential(1 / self.lam)
 
     def servers_busy(self):
-        """Check if server is busy by comparing number of end_of_service events with number of servers."""
+        """Check if server is busy by comparing number of end_of_service
+        events with number of servers. """
 
         return self.busy == self.servers

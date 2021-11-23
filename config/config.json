@@ -1,6 +1,7 @@
 {
-  "lambda": 8,
-  "mi": 8,
-  "servers": 10,
-  "simulation_time": 0.05
+  "lambda": 4,
+  "mi": 1,
+  "servers": 5,
+  "simulation_time": 5,
+  "blocking_probability": 0.2
 }

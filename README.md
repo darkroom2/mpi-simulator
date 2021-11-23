@@ -1,7 +1,7 @@
 ## Problem
 
 _Check Erlang's formula. Propose a method to calculate what must be the maximum
-traffic offered to a system in which we have N serving devices and it is
+traffic offered to a system in which we have N serving devices, and it is
 required that the probability of loss does not exceed a given value._
 
 ## Solution
@@ -13,6 +13,12 @@ presented.
 
 The simulator allows modifying the simulation parameters from the configuration
 file.
+
+## Analysis
+
+DONE: Working Erlang B simulator.
+
+TODO: Make Inverse Erlang B simulator.
 
 ---
 
@@ -49,7 +55,7 @@ pip3 install numpy
 
 ### Usage
 
-First of all, change the parameters in the [config.json](config/config.json)
+First, change the parameters in the [config.json](config/config.json)
 file.
 
 You can also create your own json file with all needed parameters, for example:
