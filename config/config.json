@@ -1,8 +1,9 @@
 {
   "lambda": 1,
   "servers": 5,
-  "simulation_time": 5,
   "blocking_probability": 0.2,
+  "simulation_time": 50,
+  "max_events": 500000,
   "seed": 123,
   "show_plots": true
 }

@@ -36,6 +36,7 @@ def main():
 
     lam = config.get('lam', 1)
     max_time = config.get('simulation_time', 5)
+    max_events = config.get('max_events', 500000)
     seed = config.get('seed', 123)
 
     mi = lam / target_rho
@@ -44,10 +45,11 @@ def main():
     logger.info(f'Running simulation to confirm the blocking probability of '
                 f'P_block = {target_probability} for calculated traffic '
                 f'ϱ = {target_rho} with loaded parameters: λ = {lam}, '
-                f'μ = {mi},  max_time = {max_time}, seed = {seed}')
+                f'μ = {mi}, max_time = {max_time}, max_events = {max_events}, '
+                f'seed = {seed}')
 
     sim = Simulator(lam=lam, mi=mi, servers=servers, max_time=max_time,
-                    seed=seed)
+                    max_events=max_events, seed=seed)
     sim.run()
 
     simulated_probability = sim.get_result()
