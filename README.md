@@ -48,6 +48,9 @@ This will install Python as well as `pip`.
 
 ### Install Python requirements
 
+1. Make sure Python and `pip` are installed and added to `PATH` system variable.
+2. Open terminal or command prompt and in the project directory type:
+
 ```commandline
 pip3 install -r requirements.txt
 ```
