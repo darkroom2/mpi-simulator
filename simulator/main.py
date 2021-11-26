@@ -22,10 +22,15 @@ def main():
 
     config = get_config('config/config.json')
 
+    # TODO: Wykresy zależności że np. P_block nie zmienia sie liniowo ze
+    #  wzrostem serwerow itp.
+
     servers = config.get('servers', 5)
+    # TODO: Dla roznych wartosci prawdopodobienst
     target_probability = config.get('blocking_probability', 0.2)
     show_plots = config.get('show_plots', True)
 
+    # TODO: dla roznej liczby serwerow
     logger.info(f'Loaded config with values: servers = {servers}, '
                 f'P_block = {target_probability}')
 
@@ -37,8 +42,10 @@ def main():
     lam = config.get('lam', 1)
     max_time = config.get('simulation_time', 5)
     max_events = config.get('max_events', 500000)
+    # TODO: zmieniony seed dla kazdej k ∈ K
     seed = config.get('seed', 123)
 
+    # TODO: mi zamienic na lam (w konfigu też)
     mi = lam / target_rho
     logger.info(f'Calculated μ = {mi} for simulation')
 
