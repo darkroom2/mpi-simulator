@@ -66,14 +66,25 @@ You can also create your own json file with all needed parameters, for example:
 
 ```json
 {
-  "lambda": 1,
-  "servers": 5,
-  "simulation_time": 5,
-  "blocking_probability": 0.2,
+  "mi_values": [0.2, 0.4, 0.6, 0.8, 1],
+  "server_counts": [5, 7, 9, 11, 13],
+  "blocking_probabilities": [0.1, 0.2, 0.3, 0.4, 0.5],
+  "simulation_repetitions": 10,
+  "time_limit": 10,
+  "events_limit": 10000,
   "seed": 123,
   "show_plots": true
 }
 ```
+
+* `mi_values` - values for mean service rate for system parameter
+* `server_counts` - values for server count parameter
+* `blocking_probabilities` - values for blocking probability parameter
+* `simulation_repetitions` - count of simulation repetitions
+* `time_limit` - time limit for each simulation
+* `events_limit` - events limit for each simulation
+* `seed` - seed to use for rng initialization
+* `show_plots` - generate plots for significant data
 
 To run the simulator, use `main` script from `simulation` module:
 

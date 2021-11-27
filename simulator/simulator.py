@@ -6,13 +6,13 @@ from numpy.random import default_rng
 
 
 class Simulator:
-    def __init__(self, lam, mi, servers: int, max_time: float, max_events: int,
-                 seed: int):
+    def __init__(self, lam, mi, servers: int, time_limit: float,
+                 events_limit: int, seed: int):
         self.lam = lam  # Lambda
         self.mi = mi  # Mi
         self.servers = servers  # Number of servers
-        self.max_time = max_time  # Simulation time
-        self.max_events = max_events  # Max number of events
+        self.time_limit = time_limit  # Max simulation time
+        self.events_limit = events_limit  # Max number of events
         self.busy = 0  # Busy servers counter
         self.start_time = 0  # Simulation start time
         self.arrivals = 0  # Incoming packet counter
@@ -25,8 +25,8 @@ class Simulator:
     def end(self):
         """End simulation condition."""
 
-        return (time() - self.start_time > self.max_time) or \
-               (self.arrivals >= self.max_events)
+        return (time() - self.start_time > self.time_limit) or \
+               (self.arrivals >= self.events_limit)
 
     def run(self):
         """Run simulation."""
@@ -89,7 +89,7 @@ class Simulator:
         """Generate serving time."""
 
         # TODO: rozne rozklady prawd. (policzyc wartosc srednia np. lognormala)
-        return self.rng.exponential(1 / self.mi, 0.001 * 1 / self.mi)
+        return self.rng.exponential(1 / self.mi)
 
     def arrival_time(self):
         """Generate arrival time."""

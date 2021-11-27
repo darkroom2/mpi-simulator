@@ -1,18 +1,81 @@
+from itertools import product
 from json import loads, JSONDecodeError
+from logging import info
 from pathlib import Path
+
+from numpy.random import default_rng
 
 from simulator.simulator import Simulator
 from simulator.utils import setup_logger, get_max_traffic
 
 
-def get_config(path):
-    """Parse json file to dict."""
+class Simulation:
+    def __init__(self, config_path):
+        self.config_path = config_path
+        self.config = self.load_config(config_path)
 
-    cfg_file = Path(path)
-    try:
-        return loads(cfg_file.read_text(encoding='utf8'))
-    except JSONDecodeError:
-        return {}
+    @staticmethod
+    def load_config(path):
+        """Parse json file to dict."""
+
+        config_file = Path(path)
+        try:
+            return loads(config_file.read_text(encoding='utf8'))
+        except JSONDecodeError:
+            return {}
+
+    def run(self):
+
+        # TODO: Wykresy zależności że np. P_block nie zmienia sie liniowo ze
+        #  wzrostem serwerow itp. ze wynik jest niezalezny od roznych rozkladow
+        #  czasu obslugi
+
+        mi_values = self.config.get('mi_values', [1])
+        server_counts = self.config.get('server_counts', [5])
+        target_probabilities = self.config.get('blocking_probabilities', [0.2])
+        sim_repetitions = self.config.get('simulation_repetitions', 10)
+        time_limit = self.config.get('time_limit', 999)
+        events_limit = self.config.get('events_limit', 500000)
+        seed = self.config.get('seed', 123)
+        show_plots = self.config.get('show_plots', True)
+        info('Simulation config loaded')
+
+        rng = default_rng(seed)
+        info(f'Initializing rng with seed = {seed}')
+
+        combinations = product(target_probabilities, mi_values, server_counts)
+        results_for_combinations = []
+
+        info(f'Running simulator with k = {sim_repetitions} repetitions for '
+             f'each combination of μ values, server counts and target '
+             f'probabilities')
+        for target_probability, mi, servers in combinations:
+            target_rho = get_max_traffic(target_probability, servers,
+                                         show_plot=show_plots)
+            info(f'Max traffic ϱ = {target_rho}, for N = {servers} servers and '
+                 f'P_block = {target_probability}')
+
+            lam = mi * target_rho
+            info(f'Calculated λ = {lam} for μ = {mi}')
+
+            simulator_results = []
+
+            for i in range(sim_repetitions):
+                info(f'Running #{i + 1} simulation')
+                sim = Simulator(lam=lam, mi=mi, servers=servers,
+                                time_limit=time_limit,
+                                events_limit=events_limit,
+                                seed=rng.integers(999999))
+                sim.run()
+
+                simulated_probability = sim.get_result()
+                info(f'Simulated P_block = {simulated_probability}')
+
+                simulator_results.append(simulated_probability)
+
+            results_for_combinations.append(simulator_results)
+
+        info(f'{results_for_combinations}')
 
 
 def main():
@@ -20,49 +83,11 @@ def main():
 
     logger = setup_logger()
 
-    config = get_config('config/config.json')
+    logger.info('Starting simulation')
 
-    # TODO: Wykresy zależności że np. P_block nie zmienia sie liniowo ze
-    #  wzrostem serwerow itp.
-
-    servers = config.get('servers', 5)
-    # TODO: Dla roznych wartosci prawdopodobienst
-    target_probability = config.get('blocking_probability', 0.2)
-    show_plots = config.get('show_plots', True)
-
-    # TODO: dla roznej liczby serwerow
-    logger.info(f'Loaded config with values: servers = {servers}, '
-                f'P_block = {target_probability}')
-
-    target_rho = get_max_traffic(target_probability, servers,
-                                 show_plot=show_plots)
-    logger.info(f'Calculated max traffic ϱ = {target_rho}, for N = {servers} '
-                f'servers and P_block = {target_probability}')
-
-    lam = config.get('lam', 1)
-    max_time = config.get('simulation_time', 5)
-    max_events = config.get('max_events', 500000)
-    # TODO: zmieniony seed dla kazdej k ∈ K
-    seed = config.get('seed', 123)
-
-    # TODO: mi zamienic na lam (w konfigu też)
-    mi = lam / target_rho
-    logger.info(f'Calculated μ = {mi} for simulation')
-
-    logger.info(f'Running simulation to confirm the blocking probability of '
-                f'P_block = {target_probability} for calculated traffic '
-                f'ϱ = {target_rho} with loaded parameters: λ = {lam}, '
-                f'μ = {mi}, max_time = {max_time}, max_events = {max_events}, '
-                f'seed = {seed}')
-
-    sim = Simulator(lam=lam, mi=mi, servers=servers, max_time=max_time,
-                    max_events=max_events, seed=seed)
+    # TODO: argparse
+    sim = Simulation('config/config.json')
     sim.run()
-
-    simulated_probability = sim.get_result()
-    diff = abs(target_probability - simulated_probability)
-    logger.info(f'Calculated absolute difference of simulated and calculated '
-                f'blocking probabilities is: {diff}')
 
 
 if __name__ == '__main__':
