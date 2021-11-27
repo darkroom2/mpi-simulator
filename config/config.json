@@ -4,7 +4,7 @@
   "blocking_probabilities": [0.1, 0.2, 0.3, 0.4, 0.5],
   "simulation_repetitions": 10,
   "time_limit": 10,
-  "events_limit": 10000,
+  "events_limit": 1000,
   "seed": 123,
   "show_plots": true
 }
