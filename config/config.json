@@ -3,8 +3,8 @@
   "server_counts": [5, 7, 9, 11, 13],
   "blocking_probabilities": [0.1, 0.2, 0.3, 0.4, 0.5],
   "simulation_repetitions": 10,
-  "time_limit": 10,
-  "events_limit": 1000,
+  "time_limit": 60,
+  "events_limit": 10000,
   "seed": 123,
-  "show_plots": true
+  "show_plots": false
 }

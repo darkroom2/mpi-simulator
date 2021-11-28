@@ -1,5 +1,5 @@
 from itertools import product
-from json import loads, JSONDecodeError
+from json import loads, JSONDecodeError, dumps
 from logging import info
 from multiprocessing import Pool
 from pathlib import Path
@@ -15,6 +15,7 @@ class Simulation:
         self.config_path = config_path
         self.config = self.load_config(config_path)
         self.rng = self.get_rng()
+        self.results = None
 
     @staticmethod
     def load_config(path):
@@ -44,9 +45,9 @@ class Simulation:
         with Pool() as pool:
             combinations = product(target_probabilities, mi_values,
                                    server_counts)
-            results_for_combinations = pool.map(self.simulate, combinations)
+            self.results = pool.map(self.simulate, combinations)
 
-        info(f'{results_for_combinations}')
+        info(f'Results: {self.results}')
 
     def simulate(self, combination):
         show_plots = self.config.get('show_plots', True)
@@ -64,7 +65,14 @@ class Simulation:
         lam = mi * target_rho
         info(f'Calculated λ = {lam} for μ = {mi}')
 
-        simulator_results = []
+        simulator_results = {
+            'servers': servers,
+            'target_probability': target_probability,
+            'target_rho': target_rho,
+            'mi': mi,
+            'lam': lam,
+            'simulated_probabilities': []
+        }
         for i in range(sim_repetitions):
             info(f'Running #{i + 1} simulation')
             sim = Simulator(lam=lam, mi=mi, servers=servers,
@@ -73,15 +81,18 @@ class Simulation:
                             seed=self.rng.integers(999999))
             sim.run()
 
-            simulated_probability = sim.get_result()
-            info(f'Simulated P_block = {simulated_probability}')
+            sim_prob = sim.get_result()
+            info(f'Simulated P_block = {sim_prob}')
 
-            simulator_results.append(simulated_probability)
+            simulator_results['simulated_probabilities'].append(sim_prob)
         return simulator_results
 
     def get_rng(self):
         seed = self.config.get('seed', 123)
         return default_rng(seed)
+
+    def get_results(self):
+        return self.results
 
 
 def main():
@@ -91,9 +102,10 @@ def main():
 
     logger.info('Starting simulation')
 
-    # TODO: argparse
     sim = Simulation('config/config.json')
     sim.run()
+
+    Path('results.json').write_text(dumps(sim.get_results()))
 
 
 if __name__ == '__main__':
