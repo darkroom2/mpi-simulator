@@ -4,21 +4,24 @@ from logging import info
 from multiprocessing import Pool
 from pathlib import Path
 
+from numpy import mean
 from numpy.random import default_rng
+from scipy.stats import t, sem
 
 from simulator.simulator import Simulator
 from simulator.utils import setup_logger, get_max_traffic
 
 
 class Simulation:
-    def __init__(self, config_path):
+    def __init__(self, config_path, results_path):
         self.config_path = config_path
-        self.config = self.load_config(config_path)
+        self.results_path = results_path
+        self.config = self.load_json(config_path)
         self.rng = self.get_rng()
         self.results = None
 
     @staticmethod
-    def load_config(path):
+    def load_json(path):
         """Parse json file to dict."""
 
         config_file = Path(path)
@@ -48,6 +51,7 @@ class Simulation:
             self.results = pool.map(self.simulate, combinations)
 
         info(f'Results: {self.results}')
+        Path(self.results_path).write_text(dumps(self.results))
 
     def simulate(self, combination):
         show_plots = self.config.get('show_plots', True)
@@ -70,9 +74,9 @@ class Simulation:
             'target_probability': target_probability,
             'target_rho': target_rho,
             'mi': mi,
-            'lam': lam,
-            'simulated_probabilities': []
+            'lam': lam
         }
+        simulated_probabilities = []
         for i in range(sim_repetitions):
             info(f'Running #{i + 1} simulation')
             sim = Simulator(lam=lam, mi=mi, servers=servers,
@@ -84,7 +88,15 @@ class Simulation:
             sim_prob = sim.get_result()
             info(f'Simulated P_block = {sim_prob}')
 
-            simulator_results['simulated_probabilities'].append(sim_prob)
+            simulated_probabilities.append(sim_prob)
+        simulator_results['simulated_probabilities'] = simulated_probabilities
+
+        confidence_interval = t.interval(alpha=0.95,
+                                         df=len(simulated_probabilities) - 1,
+                                         loc=mean(simulated_probabilities),
+                                         scale=sem(simulated_probabilities))
+
+        simulator_results['confidence_interval'] = confidence_interval
         return simulator_results
 
     def get_rng(self):
@@ -94,6 +106,26 @@ class Simulation:
     def get_results(self):
         return self.results
 
+    def show_results(self):
+        results = self.results
+        if not results:
+            results = self.load_json(self.results_path)
+
+        fix_servers_fix_prob = [
+            result for result in results if
+            result['servers'] == 9 and result['target_probability'] == 0.2
+        ]
+
+        fix_servers_fix_mi = [
+            result for result in results if
+            result['servers'] == 9 and result['mi'] == 0.4
+        ]
+
+        fix_prob_fix_mi = [
+            result for result in results if
+            result['target_probability'] == 0.2 and result['mi'] == 1
+        ]
+
 
 def main():
     """Testing simulator."""
@@ -102,10 +134,9 @@ def main():
 
     logger.info('Starting simulation')
 
-    sim = Simulation('config/config.json')
+    sim = Simulation('config/config.json', 'results.json')
     sim.run()
-
-    Path('results.json').write_text(dumps(sim.get_results()))
+    # sim.show_results()
 
 
 if __name__ == '__main__':
