@@ -88,8 +88,7 @@ class Simulator:
     def serve_time(self):
         """Generate serving time."""
 
-        # TODO: rozne rozklady prawd. (policzyc wartosc srednia np. lognormala)
-        return self.rng.exponential(1 / self.mi, 0.001 * 1 / self.mi)
+        return self.rng.exponential(1 / self.mi)
 
     def arrival_time(self):
         """Generate arrival time."""
