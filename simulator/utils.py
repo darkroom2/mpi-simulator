@@ -45,12 +45,20 @@ def get_max_traffic(target_prob, servers, max_erlangs=500, accuracy=0.0001,
     erlangs = arange(0, max_erlangs, accuracy)
     probabilities = erlang_b(erlangs, servers)
 
+    traffic = get_x_for_y(x=erlangs, y=probabilities, value=target_prob)
+    (x, y) = (traffic, target_prob)
+
     if show_plot:
-        plt.title(f'Erlang B formula for N = {servers} servers')
+        plt.title(f'Erlang B formula for N = {servers} servers and '
+                  f'$P_b$ = {target_prob}')
         plt.plot(erlangs, probabilities)
+        plt.xlabel('traffic ϱ [Erlangs]')
+        plt.ylabel('blocking probability')
+        plt.plot(x, y, 'ro')
+        plt.text(x + 10, y, f'({x}, {y})')
         plt.show()
 
-    return get_x_for_y(x=erlangs, y=probabilities, value=target_prob)
+    return traffic
 
 
 def find_closest(array, value):

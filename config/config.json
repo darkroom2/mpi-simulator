@@ -1,9 +1,10 @@
 {
-  "lambda": 1,
-  "servers": 5,
-  "blocking_probability": 0.2,
-  "simulation_time": 50,
-  "max_events": 500000,
+  "mi_values": [0.2, 0.4, 0.6, 0.8, 1],
+  "server_counts": [5, 7, 9, 11, 13],
+  "blocking_probabilities": [0.1, 0.2, 0.3, 0.4, 0.5],
+  "simulation_repetitions": 10,
+  "time_limit": 60,
+  "events_limit": 10000,
   "seed": 123,
-  "show_plots": true
+  "show_plots": false
 }
